@@ -24,13 +24,139 @@ function FloatingPetal({ style }) {
   );
 }
 
+const pages = [
+  {
+    id: 1,
+    icon: "💗",
+    title: "Happy One Month\nMeri Jaan Sweety 💖",
+    content: (
+      <>
+        Ek mahina pehle tune "haan" kaha tha —<br />
+        aur tab se ab tak hum sirf tumhara intezaar<br />
+        kar rahe hain kab mere Sweety 💖 idhar aayegi.
+        <br /><br />
+        Aur humko uss tarah apna loge<br />
+        jaise hum chahte hain... 🌹
+      </>
+    ),
+  },
+  {
+    id: 2,
+    icon: "🥀",
+    title: "Ek Mahine Ka Ehsaas",
+    content: (
+      <>
+        Ek mahine mein tumne mujhe yeh ehsaas diya<br />
+        ki koi kisi ka intezaar karna bhi<br />
+        kitna khoobsurat hota hai. 💞
+        <br /><br />
+        Mana thodi takraar hui —<br />
+        par woh tumko paane ke chakkar mein<br />
+        tumse lad baithe... 🌹
+        <br /><br />
+        <em>Sorry Meri Jaan 💖</em>
+      </>
+    ),
+  },
+  {
+    id: 3,
+    icon: "✈️",
+    title: "Milna Chahte The...",
+    content: (
+      <>
+        Hum tumse milke yeh pehla mahina<br />
+        tumhare saath bitaana chahte the —<br />
+        isliye aana chahte the... 🌹
+        <br /><br />
+        Tum Kya Ho Mere Liye Nahi Bata Sakte Hum,<br />
+        par tumhara khayal har pal paas rakhta hai. 💗
+      </>
+    ),
+  },
+  {
+    id: 4,
+    icon: "🌙",
+    title: "5 Saal",
+    content: (
+      <>
+        Meri sacchi choti si duniya mein<br />
+        hum sachchi 5 saal baad kisi ko laaye —<br />
+        kyunki 5 saal lage yeh dhundhne mein<br />
+        ki kaun hai jo mera dil kabhi nahi torega. 💔➡️💗
+        <br /><br />
+        Humko tumhare alawa sachchi kisi pe<br />
+        bharosa nahi hota tha...
+        <br /><br />
+        Hum chahte to kisi aur ko chun lete —<br />
+        lekin darr tha ki chod diya jaayega...
+        <br /><br />
+        Tum humein safe place lagte the,<br />
+        isliye hum yahan aaye. 🌹
+        <br />
+        isliye Itna efforts kr rahe hai
+      </>
+    ),
+  },
+  {
+    id: 5,
+    icon: "🤝",
+    title: "Hum .....",
+    content: (
+      <>
+        Humko pata hai kya takleef aa rahi hai —<br />
+        tumhare aur hamare feelings ke beech mein.<br />
+        Tum kuch keh nahi pa rahe ho,<br />
+        par hum jaante hain. 💗
+        <br /><br />
+        Hum chahte hain — mera haath pakad ke<br />
+        ab baadho mere saath, poori tarah aage. 🌹
+        <br /><br />
+        Hum kabhi Prince ko tum se alag nahi karenge<br />
+        jab tak tum na chahna — <em>I Promise Love.</em>
+        <br /><br />
+        Usse baat karo — par mere banke. 💞<br />
+        Hum tumhari har feeling samajhte hain,<br />
+        isliye Alag nahi krna chhate <br />
+        isliye tumhare saath hain. 💖
+      </>
+    ),
+  },
+  {
+    id: 6,
+    icon: "💌",
+    title: "Ab Keh Do Na...",
+    content: (
+      <>
+        Hum chahte hain ab apna kal chunno —<br />
+        tum mere saath, humko poori tarah<br />
+        apne mann mein rakh ke. 💗
+        <br /><br />
+        Jaise tumko rakhna chahiye. 🌹
+        <br /><br />
+        Tumko pata hai hum tumko<br />
+        bahut chahte hain. 💖
+        <br /><br />
+        Yeh sab milke kehna chahte the —<br />
+        nahi keh paye, isliye likh rahe hain.
+        <br /><br />
+        <strong>Meri Jaan, apna lo humko poore mann se.<br />
+        Please... I Love You. 💗</strong> <br />
+        <strong>Keh Nahi Pa Rahe Likh ke Bhej Do.<br />
+        Please... I Love You. 💗</strong>
+      </>
+    ),
+    isLast: true,
+  },
+];
+
 export default function ProposalPage() {
   const [petals, setPetals] = useState([]);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
   const [replyText, setReplyText] = useState("");
   const [replySubmitted, setReplySubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
+  const [animating, setAnimating] = useState(false);
 
   useEffect(() => {
     const generated = Array.from({ length: 24 }, (_, i) => ({
@@ -41,26 +167,24 @@ export default function ProposalPage() {
       emoji: hearts[Math.floor(Math.random() * hearts.length)],
       id: i,
     }));
-
     setPetals(generated);
   }, []);
 
-  const chooseAnswer = (answer) => {
-    setSelectedAnswer(answer);
-    setReplyText("");
-    setReplySubmitted(false);
-    setSendError("");
+  const goToPage = (index) => {
+    if (animating) return;
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrentPage(index);
+      setAnimating(false);
+    }, 300);
   };
 
   const sendReply = async () => {
-    if (!selectedAnswer || !replyText.trim()) return;
-
+    if (!replyText.trim()) return;
     setSending(true);
     setSendError("");
-
     try {
-      const result = await sendEmail(replyText, selectedAnswer);
-
+      const result = await sendEmail(replyText, "Yes");
       if (result.success) {
         setReplySubmitted(true);
       } else {
@@ -73,6 +197,11 @@ export default function ProposalPage() {
       setSending(false);
     }
   };
+  
+
+  const page = pages[currentPage];
+  const isFirst = currentPage === 0;
+  const isLast = currentPage === pages.length - 1;
 
   return (
     <>
@@ -95,6 +224,11 @@ export default function ProposalPage() {
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(24px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(-20px); }
         }
 
         @keyframes pulse {
@@ -152,7 +286,14 @@ export default function ProposalPage() {
             0 0 60px rgba(200,60,100,0.15),
             0 0 120px rgba(160,30,70,0.10),
             inset 0 1px 0 rgba(255,200,220,0.08);
-          animation: fadeUp 0.8s ease both;
+        }
+
+        .card-inner {
+          animation: fadeUp 0.5s ease both;
+        }
+
+        .card-inner.exit {
+          animation: fadeOut 0.3s ease both;
         }
 
         .icon {
@@ -166,19 +307,20 @@ export default function ProposalPage() {
           margin-bottom: 16px;
           color: #f9e0e8;
           font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(2rem, 7vw, 3.1rem);
+          font-size: clamp(1.6rem, 6vw, 2.6rem);
           font-style: italic;
           font-weight: 700;
-          line-height: 1.25;
+          line-height: 1.3;
           animation: glow 3s ease-in-out infinite;
+          white-space: pre-line;
         }
 
         .subtitle {
           margin-bottom: 30px;
           color: rgba(245,214,223,0.76);
-          font-size: 1.2rem;
+          font-size: 1.15rem;
           font-style: italic;
-          line-height: 1.7;
+          line-height: 1.85;
         }
 
         .divider {
@@ -188,11 +330,36 @@ export default function ProposalPage() {
           background: linear-gradient(90deg, transparent, rgba(220,130,155,0.65), transparent);
         }
 
-        .choice-row {
+        .page-dots {
           display: flex;
-          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 28px;
+        }
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgba(220,120,150,0.28);
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: all 0.3s ease;
+        }
+
+        .dot.active {
+          background: #c94466;
+          transform: scale(1.3);
+          box-shadow: 0 0 8px rgba(200,60,100,0.6);
+        }
+
+        .nav-row {
+          display: flex;
           justify-content: center;
           gap: 14px;
+          margin-top: 32px;
+          flex-wrap: wrap;
         }
 
         .btn {
@@ -214,6 +381,7 @@ export default function ProposalPage() {
 
         .btn:disabled {
           cursor: not-allowed;
+          opacity: 0.4;
         }
 
         .btn-yes {
@@ -222,22 +390,10 @@ export default function ProposalPage() {
           box-shadow: 0 6px 30px rgba(180,40,80,0.45);
         }
 
-        .btn-no {
+        .btn-prev {
           background: rgba(255,255,255,0.05);
           color: rgba(245,214,223,0.82);
           border: 1px solid rgba(220,120,150,0.28);
-        }
-
-        .answer-pill {
-          display: inline-block;
-          margin-bottom: 18px;
-          padding: 8px 18px;
-          border: 1px solid rgba(220,120,150,0.35);
-          border-radius: 999px;
-          background: rgba(255,255,255,0.06);
-          color: #f9e0e8;
-          font-size: 1rem;
-          font-style: italic;
         }
 
         .reply-box {
@@ -305,14 +461,17 @@ export default function ProposalPage() {
           animation: fadeUp 0.5s ease both;
         }
 
-        @media (max-width: 520px) {
-          .card {
-            padding: 42px 24px;
-          }
+        .page-label {
+          font-size: 0.82rem;
+          color: rgba(245,180,200,0.40);
+          letter-spacing: 0.08em;
+          margin-bottom: 20px;
+          font-style: italic;
+        }
 
-          .btn {
-            width: 100%;
-          }
+        @media (max-width: 520px) {
+          .card { padding: 42px 24px; }
+          .btn  { width: 100%; }
         }
       `}</style>
 
@@ -322,61 +481,83 @@ export default function ProposalPage() {
         ))}
 
         <section className="card">
-          <span className="icon">💗</span>
-          <h1>maan jow na sweety</h1>
-          <div className="divider" />
-          <p className="subtitle">
-            Kitna mante hai tumko Phir bhi nahi Ha .
-          </p>
+          <div className={`card-inner ${animating ? "exit" : ""}`}>
 
-          <div className="choice-row">
-            <button className="btn btn-yes" onClick={() => chooseAnswer("Yes")}>
-              Yes 💖
-            </button>
-            <button className="btn btn-no" onClick={() => chooseAnswer("No")}>
-              No 🥺
-            </button>
-          </div>
-
-          {selectedAnswer && (
-            <div className="reply-box">
-              <span className="answer-pill">
-                Selected answer: {selectedAnswer}
-              </span>
-
-              {!replySubmitted ? (
-                <>
-                  <label className="reply-label" htmlFor="reply">
-                    💌 Write your reply
-                  </label>
-                  <textarea
-                    id="reply"
-                    className="reply-input"
-                    placeholder="Write your message here..."
-                    value={replyText}
-                    onChange={(event) => setReplyText(event.target.value)}
-                    disabled={sending}
-                  />
-                  <br />
-                  <button
-                    className="btn reply-submit"
-                    onClick={sendReply}
-                    disabled={sending || !replyText.trim()}
-                    style={{ opacity: sending || !replyText.trim() ? 0.68 : 1 }}
-                  >
-                    {sending ? "Sending..." : "Send To Gaurav 💗"}
-                  </button>
-                  {sendError && <p className="error">{sendError}</p>}
-                </>
-              ) : (
-                <div className="reply-display">
-                  Your {selectedAnswer} reply has been sent to Gaurav.
-                  <br />
-                  "{replyText}"
-                </div>
-              )}
+            <div className="page-dots">
+              {pages.map((_, i) => (
+                <button
+                  key={i}
+                  className={`dot ${i === currentPage ? "active" : ""}`}
+                  onClick={() => goToPage(i)}
+                />
+              ))}
             </div>
-          )}
+
+            <p className="page-label">{currentPage + 1} / {pages.length}</p>
+
+            <span className="icon">{page.icon}</span>
+            <h1>{page.title}</h1>
+            <div className="divider" />
+            <p className="subtitle">{page.content}</p>
+
+            {!isLast && (
+              <div className="nav-row">
+                {!isFirst && (
+                  <button className="btn btn-prev" onClick={() => goToPage(currentPage - 1)}>
+                    ← Peeche
+                  </button>
+                )}
+                <button className="btn btn-yes" onClick={() => goToPage(currentPage + 1)}>
+                  Aage → 💗
+                </button>
+              </div>
+            )}
+
+            {isLast && (
+              <>
+                <div className="reply-box">
+                  {!replySubmitted ? (
+                    <>
+                      <label className="reply-label" htmlFor="reply">
+                        💌 Tumhara Gaurav
+                      </label>
+                      <textarea
+                        id="reply"
+                        className="reply-input"
+                        placeholder="Kehhhhh Do Sweety ... 💌"
+                        value={replyText}
+                        onChange={(event) => setReplyText(event.target.value)}
+                        disabled={sending}
+                      />
+                      <br />
+                      <button
+                        className="btn reply-submit"
+                        onClick={sendReply}
+                        disabled={sending || !replyText.trim()}
+                        style={{ opacity: sending || !replyText.trim() ? 0.68 : 1 }}
+                      >
+                        {sending ? "Bhej rahe hain..." : "Bhejo Gaurav Ko 💗"}
+                      </button>
+                      {sendError && <p className="error">{sendError}</p>}
+                    </>
+                  ) : (
+                    <div className="reply-display">
+                      Gaurav ko tera message mil gaya 💌
+                      <br />
+                      &ldquo;{replyText}&rdquo;
+                    </div>
+                  )}
+                </div>
+
+                <div className="nav-row">
+                  <button className="btn btn-prev" onClick={() => goToPage(currentPage - 1)}>
+                    ← Peeche
+                  </button>
+                </div>
+              </>
+            )}
+
+          </div>
         </section>
       </main>
     </>
